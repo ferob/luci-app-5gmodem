@@ -1645,8 +1645,9 @@ msgstr "Modemkommunikációs port"
 
 msgid "Port used to read modem/connection info: one of the available ttyUSBX ports.<br /> <br />HiLink and other modems with a web interface are found automatically and need no port."
 msgstr "A modem-/kapcsolati adatok lekérdezésére használt port: az elérhető ttyUSBX portok egyike.<br /> <br />A HiLink és más, webes kezelőfelülettel rendelkező modemek automatikusan felismerésre kerülnek, és nem igényelnek portbeállítást."
+
 msgid "Port for AT / SMS / USSD"
-msgstr "Порт для AT / SMS / USSD"
+msgstr "AT / SMS / USSD port"
 
 msgid "AT command port used for SMS, USSD and AT commands. On most modems it is the same as the modem communication port."
 msgstr "SMS-ekhez, USSD-hez és AT-parancsokhoz használt AT-port. A legtöbb modemnél megegyezik a modemkommunikációs porttal."
