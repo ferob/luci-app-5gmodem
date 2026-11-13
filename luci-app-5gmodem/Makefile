@@ -98,7 +98,7 @@ endef
 
 define Package/luci-app-5gmodem/prerm
 #!/bin/sh
-[ -n "$${IPKG_INSTROOT}" ] || rm -f /usr/lib/lua/luci/i18n/5gmodem.ru.lmo
+[ -n "$${IPKG_INSTROOT}" ] || rm -f /usr/lib/lua/luci/i18n/5gmodem.hu.lmo
 exit 0
 endef
 
@@ -108,8 +108,8 @@ include $(TOPDIR)/feeds/luci/luci.mk
 
 define Build/Prepare/luci-app-5gmodem
 	$(INSTALL_DIR) $(PKG_BUILD_DIR)/root/usr/share/5gmodem/i18n
-	-$(STAGING_DIR_HOST)/bin/po2lmo $(CURDIR)/po-ru/5gmodem.po \
-		$(PKG_BUILD_DIR)/root/usr/share/5gmodem/i18n/5gmodem.ru.lmo
+	-$(STAGING_DIR_HOST)/bin/po2lmo $(CURDIR)/po-hu/5gmodem.po \
+		$(PKG_BUILD_DIR)/root/usr/share/5gmodem/i18n/5gmodem.hu.lmo
 endef
 
 define Package/luci-app-5gmodem-lite
