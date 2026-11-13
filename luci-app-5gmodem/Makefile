@@ -103,6 +103,7 @@ exit 0
 endef
 
 LUCI_LANG.id:=Bahasa Indonesia (Indonesian)
+LUCI_LANG.hu:=Magyar (Hungarian)
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
