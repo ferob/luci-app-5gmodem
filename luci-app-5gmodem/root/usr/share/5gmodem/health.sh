@@ -795,9 +795,7 @@ heal() {
 						_h_ndt=${_h_nd#try }
 						case "$_h_ndt" in ''|*[!0-9]*) _h_ndt=0 ;; esac
 						[ $(( $(uptime_s) - _h_ndt )) -ge 120 ] || continue
-#						: > "$HDIR/$_h_if.nodata"
 						rm -f "$HDIR/$_h_if.nodata"
-#						_ev "$_h_if: still no traffic after a reconnect ($_h_lip) - looks like a carrier restriction, healing stopped"
 						_ev "$_h_if: still no traffic after a reconnect ($_h_lip) - looks like a carrier restriction, escalating further"
 						;;
 				esac
