@@ -6748,6 +6748,9 @@ msgstr "Keresés feladó és szöveg alapján"
 msgid "Select a conversation on the left"
 msgstr "Válassz egy beszélgetést bal oldalon"
 
+msgid "Select"
+msgstr "Kijelölés"
+
 msgid "Select several"
 msgstr "Több kijelölése"
 
