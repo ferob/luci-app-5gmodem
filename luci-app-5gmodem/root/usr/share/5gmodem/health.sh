@@ -786,7 +786,7 @@ heal() {
 					printf 'try %s\n' "$(uptime_s)" > "$HDIR/$_h_if.nodata"
 #					rm -f "$HDIR/$_h_if.heal"
 					_ev "$_h_if: has an address ($_h_lip) but no traffic - one reconnect before calling it a carrier restriction"
-					( ifdown "$_h_if"; sleep 3; iface_up "$_h_if" ) >/dev/null 2>&1 </dev/null 9>&- &
+					_heal_start _heal_reconnect "$_h_if"
 					continue
 				fi
 				_h_nd=$(cat "$HDIR/$_h_if.nodata" 2>/dev/null)
