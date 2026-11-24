@@ -784,7 +784,7 @@ heal() {
 				rm -f "$HDIR/$_h_if.on2g"
 				if [ ! -f "$HDIR/$_h_if.nodata" ]; then
 					printf 'try %s\n' "$(uptime_s)" > "$HDIR/$_h_if.nodata"
-#					rm -f "$HDIR/$_h_if.heal"
+					# rm -f "$HDIR/$_h_if.heal"
 					_ev "$_h_if: has an address ($_h_lip) but no traffic - one reconnect before calling it a carrier restriction"
 					_heal_start _heal_reconnect "$_h_if"
 					continue
@@ -799,7 +799,7 @@ heal() {
 						_ev "$_h_if: still no traffic after a reconnect ($_h_lip) - looks like a carrier restriction, escalating further"
 						;;
 				esac
-#				continue
+				# continue
 			fi
 		fi
 		rm -f "$HDIR/$_h_if.nodata"
