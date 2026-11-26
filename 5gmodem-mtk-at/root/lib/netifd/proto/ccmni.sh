@@ -51,6 +51,63 @@ ccmni_registered() {
 	return 1
 }
 
+# CFUN transitions can be rejected after a SIM-wait cancellation. A fresh
+# SIM event permits one native modem power-on recovery, never a reset loop.
+ccmni_recover_radio() {
+	local interface="$1" dir=/tmp/5gmodem/simwait stamp previous consumed
+	case "$interface" in ''|*[!A-Za-z0-9_-]*) return 1 ;; esac
+	[ -r "$dir/$interface.resume" ] || return 1
+	read -r stamp < "$dir/$interface.resume"
+	case "$stamp" in ''|*[!0-9]*) return 1 ;; esac
+	consumed=$(cat "$dir/$interface.ccmni_resume" 2>/dev/null || :)
+	[ "$stamp" != "$consumed" ] || return 1
+	previous=$(cat "$dir/$interface.ccmni_radio" 2>/dev/null || :)
+	[ "$stamp" != "$previous" ] || return 1
+	# Record before sending: EPON may remove the AT port before replying.
+	printf '%s\n' "$stamp" > "$dir/$interface.ccmni_radio" || return 1
+	echo "ccmni: restoring modem power after SIM insertion"
+	ccmni_at 'AT+EPON' 10000 >/dev/null || :
+	return 0
+}
+
+ccmni_attach_packet() {
+	local i
+	for i in $(seq 1 12); do
+		if ccmni_at 'AT+CGATT?' | grep -q '^+CGATT: *1$'; then
+			break
+		fi
+		# Detach completion can precede readiness for another attach request.
+		# Retry transient errors; only the queried state confirms completion.
+		ccmni_at 'AT+CGATT=1' 5000 >/dev/null
+		sleep 1
+	done
+	ccmni_at 'AT+CGATT?' | grep -q '^+CGATT: *1$' || return 1
+}
+
+# A newly inserted SIM needs a fresh packet session even if the old bearer
+# still reports an address. Consume each SIM-ready event only after reattach.
+ccmni_resume_sim() {
+	local interface="$1" dir=/tmp/5gmodem/simwait stamp consumed i detached=0
+	case "$interface" in ''|*[!A-Za-z0-9_-]*) return 1 ;; esac
+	[ -r "$dir/$interface.resume" ] || return 0
+	read -r stamp < "$dir/$interface.resume"
+	case "$stamp" in ''|*[!0-9]*) return 0 ;; esac
+	consumed=$(cat "$dir/$interface.ccmni_resume" 2>/dev/null || :)
+	[ "$stamp" != "$consumed" ] || return 0
+	echo "ccmni: renewing packet session after SIM insertion"
+	ccmni_at 'AT+CGATT=0' 10000 | grep -q '^OK$' || return 1
+	for i in $(seq 1 5); do
+		if ccmni_at 'AT+CGATT?' | grep -q '^+CGATT: *0$'; then
+			detached=1
+			break
+		fi
+		sleep 1
+	done
+	[ "$detached" = 1 ] || return 1
+	ccmni_attach_packet || return 1
+	printf '%s\n' "$stamp" > "$dir/$interface.ccmni_resume"
+}
+
 proto_ccmni_init_config() {
 	no_device=1
 	available=1
@@ -66,7 +123,7 @@ proto_ccmni_init_config() {
 
 proto_ccmni_setup() {
 	local interface="$1"
-	local ifname at_device apn pdptype regtimeout defaultroute peerdns metric i ip rdp dns1 dns2 ctx cur_pdp cur_apn zone6
+	local ifname at_device apn pdptype regtimeout defaultroute peerdns metric i ip rdp dns1 dns2 ctx cur_pdp cur_apn zone6 context_changed=0 packet_detached=0
 	json_get_vars ifname at_device apn pdptype regtimeout defaultroute peerdns metric
 	[ -n "$at_device" ] && MTK_SOCK="$at_device"
 	ifname="${ifname:-ccmni0}"
@@ -110,17 +167,68 @@ proto_ccmni_setup() {
 				done
 				;;
 		esac
+	fi
+
+	# Waiting for an absent SIM can cancel setup between CFUN=0 and CFUN=4.
+	# Resume from that intermediate state before attempting to enable the radio.
+	case "$(ccmni_at 'AT+CFUN?')" in
+		*"CFUN: 0"*)
+			ccmni_at 'AT+CFUN=4' 15000 | grep -q '^OK$' || {
+				ccmni_recover_radio "$interface" || \
+					proto_notify_error "$interface" RADIO_PREPARE_FAILED
+				sleep 5
+				return 1
+			}
+			;;
+	esac
+
+	# SIM reinsertion can restore the modem's placeholder attach context.
+	# An unset APN means automatic selection, not reuse of that context.
+	ctx=$(ccmni_ctx)
+	[ -n "$ctx" ] || {
+		proto_notify_error "$interface" NO_ATTACH_CONTEXT
+		return 1
+	}
+	cur_pdp="${ctx%% *}"
+	cur_apn="${ctx#* }"
+	[ "$ctx" = "$cur_pdp" ] && cur_apn=""
+	[ -n "$pdptype" ] || pdptype="$cur_pdp"
+	if [ "$pdptype" != "$cur_pdp" ] || [ "$apn" != "$cur_apn" ]; then
+		echo "ccmni: configuring attach context before registration"
 		case "$(ccmni_at 'AT+CFUN?')" in
-			*"CFUN: 0"*|*"CFUN: 4"*)
-				ctx=$(ccmni_ctx)
-				cur_pdp="${ctx%% *}"
-				cur_apn="${ctx#* }"
-				[ "$ctx" = "$cur_pdp" ] && cur_apn=""
-				[ -n "$apn" ] || apn="$cur_apn"
-				[ -n "$pdptype" ] && { [ "$pdptype" != "$cur_pdp" ] || [ "$apn" != "$cur_apn" ]; } && \
-					ccmni_at "AT+CGDCONT=0,\"$pdptype\",\"$apn\"" >/dev/null
+			*"CFUN: 0"*|*"CFUN: 4"*) ;;
+			*)
+				if ccmni_at "AT+EFUN=0" 15000 | grep -q '^OK$'; then
+					sleep 3
+				elif ccmni_at 'AT+CGATT?' | grep -q '^+CGATT: *0$'; then
+					# With no packet registration EFUN may be rejected even
+					# though the attach context is writable. Reattach explicitly.
+					packet_detached=1
+				else
+					proto_notify_error "$interface" ATTACH_CONTEXT_FAILED
+					sleep 5
+					return 1
+				fi
 				;;
 		esac
+		ccmni_at "AT+CGDCONT=0,\"$pdptype\",\"$apn\"" | grep -q '^OK$' || {
+			proto_notify_error "$interface" ATTACH_CONTEXT_FAILED
+			sleep 5
+			return 1
+		}
+		context_changed=1
+	fi
+
+	if [ "$packet_detached" = 1 ]; then
+		ccmni_attach_packet || {
+			proto_notify_error "$interface" PACKET_ATTACH_FAILED
+			sleep 5
+			return 1
+		}
+		context_changed=0
+	fi
+
+	if [ "$context_changed" = 1 ] || ! ccmni_registered; then
 		ccmni_at "AT+CMEE=1" >/dev/null
 		ccmni_at "AT+EMSR=0,0" >/dev/null
 		ccmni_at "AT+EGFB=0,1" >/dev/null
@@ -133,28 +241,16 @@ proto_ccmni_setup() {
 		done
 		ccmni_registered || ccmni_cycle "$regtimeout"
 	fi
-	ctx=$(ccmni_ctx)
-	cur_pdp="${ctx%% *}"
-	cur_apn="${ctx#* }"
-	[ "$ctx" = "$cur_pdp" ] && cur_apn=""
-	[ -n "$pdptype" ] || pdptype="$cur_pdp"
-	[ -n "$apn" ] || apn="$cur_apn"
-	if [ -n "$pdptype" ] && { [ "$pdptype" != "$cur_pdp" ] || [ "$apn" != "$cur_apn" ]; }; then
-		echo "ccmni: attach context ($cur_pdp \"$cur_apn\") -> ($pdptype \"$apn\"), restarting the radio"
-		ccmni_at "AT+EFUN=0" 15000 >/dev/null
-		sleep 3
-		ccmni_at "AT+CGDCONT=0,\"$pdptype\",\"$apn\"" >/dev/null
-		ccmni_at "AT+EFUN=1" 15000 >/dev/null
-		for i in $(seq 1 "$regtimeout"); do
-			ccmni_registered && break
-			sleep 1
-		done
-		ccmni_registered || ccmni_cycle "$regtimeout"
-	fi
 
 	ccmni_registered || {
 		echo "ccmni: not registered: $(ccmni_at 'AT+CEREG?' | grep CEREG) $(ccmni_at 'AT+COPS?' | grep COPS)"
 		proto_notify_error "$interface" NOT_REGISTERED
+		return 1
+	}
+
+	ccmni_resume_sim "$interface" || {
+		proto_notify_error "$interface" PACKET_ATTACH_FAILED
+		sleep 5
 		return 1
 	}
 
