@@ -7696,11 +7696,5 @@ msgstr "A SIM-kártya PIN-kódot kér"
 msgid "SIM requires PUK"
 msgstr "A SIM-kártya PUK-kódot kér"
 
-msgid "The PIN must contain 4–8 digits"
-msgstr "A PIN-kódnak 4–8 számjegyből kell állnia"
-
-msgid "The modem did not confirm the SIM PIN operation"
-msgstr "A modem nem erősítette meg a SIM PIN-műveletet"
-
-msgid "The modem is busy"
-msgstr "A modem foglalt"
+msgid "Could not update the installed MediaTek helper package."
+msgstr "Nem sikerült frissíteni a telepített MediaTek segédcsomagot."
