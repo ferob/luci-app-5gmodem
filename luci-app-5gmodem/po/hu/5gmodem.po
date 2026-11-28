@@ -7698,3 +7698,174 @@ msgstr "A SIM-kártya PUK-kódot kér"
 
 msgid "Could not update the installed MediaTek helper package."
 msgstr "Nem sikerült frissíteni a telepített MediaTek segédcsomagot."
+
+msgid "Layers"
+msgstr "Rétegek"
+
+msgid "Track"
+msgstr "Útvonal"
+
+msgid "Position accuracy"
+msgstr "Pozíció pontossága"
+
+msgid "A password is saved. Leave this field empty to keep it."
+msgstr "A jelszó el van mentve. Hagyja üresen ezt a mezőt, ha nem kívánja módosítani."
+
+msgid "An account operation is already running."
+msgstr "Már folyamatban van egy fiókművelet."
+
+msgid "Check sign-in"
+msgstr "Bejelentkezés ellenőrzése"
+
+msgid "Check the login and password."
+msgstr "Ellenőrizze a felhasználónevet és a jelszót."
+
+msgid "Could not connect to the service"
+msgstr "Nem sikerült csatlakozni a szolgáltatáshoz"
+
+msgid "Could not save the account."
+msgstr "Nem sikerült menteni a fiókot."
+
+msgid "Enter the password for this account."
+msgstr "Adja meg a fiókhoz tartozó jelszót."
+
+msgid "Install curl to connect to these services."
+msgstr "Telepítse a curl csomagot a szolgáltatásokhoz való csatlakozáshoz."
+
+msgid "Login"
+msgstr "Felhasználónév"
+
+msgid "One account for 4Cells and Speedmetrics. Saving it does not send measurements."
+msgstr "Egyetlen fiók a 4Cells és a Speedmetrics szolgáltatásokhoz. A mentés nem küld el méréseket."
+
+msgid "Remove saved account"
+msgstr "Mentett fiók eltávolítása"
+
+msgid "Save the account first."
+msgstr "Először mentse el a fiókot."
+
+msgid "Service unavailable"
+msgstr "A szolgáltatás nem érhető el"
+
+msgid "Sign-in rejected"
+msgstr "Bejelentkezés elutasítva"
+
+msgid "Sign-in verified"
+msgstr "Bejelentkezés ellenőrizve"
+
+msgid "Too many requests. Try again later."
+msgstr "Túl sok kérés. Próbálja újra később."
+
+msgid "Check sign-in in the 4Cells / Speedmetrics settings."
+msgstr "Ellenőrizze a bejelentkezést a 4Cells / Speedmetrics beállításaiban."
+
+msgid "Could not load the external layer."
+msgstr "Nem sikerült betölteni a külső réteget."
+
+msgid "Loading external layers…"
+msgstr "Külső rétegek betöltése…"
+
+msgid "Mbit/s"
+msgstr "Mbit/s"
+
+msgid "Network type"
+msgstr "Hálózat típusa"
+
+msgid "Select operator"
+msgstr "Szolgáltató kiválasztása"
+
+msgid "Speed measurements (Speedmetrics)"
+msgstr "Sebességmérések (Speedmetrics)"
+
+msgid "Towers (4Cells)"
+msgstr "Tornyok (4Cells)"
+
+msgid "Towers (Speedmetrics)"
+msgstr "Tornyok (Speedmetrics)"
+
+msgid "Zoom in to load external layers."
+msgstr "Közelítsen a térképre a külső rétegek betöltéséhez."
+
+msgid "Sign in"
+msgstr "Bejelentkezés"
+
+msgid "Signed in"
+msgstr "Bejelentkezve"
+
+msgid "Sign in to use the map layers. No measurements are sent."
+msgstr "Jelentkezzen be a térképrétegek használatához. Mérések nem kerülnek elküldésre."
+
+msgid "Sign in under Settings → Telemetry."
+msgstr "Jelentkezzen be a Beállítások → Telemetria menüpontban."
+
+msgid "Towers"
+msgstr "Tornyok"
+
+msgid "4Cells login"
+msgstr "4Cells felhasználónév"
+
+msgid "Measurements"
+msgstr "Mérések"
+
+msgid "Terrain"
+msgstr "Domborzat"
+
+msgid "Hillshade"
+msgstr "Domborzatárnyékolás"
+
+msgid "Contour lines"
+msgstr "Szintvonalak"
+
+msgid "Could not load elevation data."
+msgstr "Nem sikerült betölteni a magassági adatokat."
+
+msgid "Calculated position"
+msgstr "Számított pozíció"
+
+msgid "Manually set position"
+msgstr "Manuálisan beállított pozíció"
+
+msgid "Verified position"
+msgstr "Ellenőrzött pozíció"
+
+msgid "Position inherited from site"
+msgstr "Telephelytől örökölt pozíció"
+
+msgid "Position needs clarification"
+msgstr "A pozíció pontosításra szorul"
+
+msgid "GPS time"
+msgstr "GPS-idő"
+
+msgid "Buildings"
+msgstr "Épületek"
+
+msgid "Labels"
+msgstr "Feliratok"
+
+msgid "Points of interest"
+msgstr "Érdekes pontok (POI)"
+
+msgid "Roads"
+msgstr "Utak"
+
+msgid "3D buildings"
+msgstr "3D-s épületek"
+
+msgid "The service denied access. Layer requests are paused."
+msgstr "A szolgáltatás megtagadta a hozzáférést. A rétegek lekérése szünetel."
+
+msgid "Layer requests are temporarily paused after a service error."
+msgstr "A rétegek lekérése szolgáltatáshiba miatt átmenetileg szünetel."
+
+msgid "The service returned an unexpected page. Layer requests are paused."
+msgstr "A szolgáltatás váratlan oldalt küldött vissza. A rétegek lekérése szünetel."
+
+msgid "Measurements (4Cells)"
+msgstr "Mérések (4Cells)"
+
+msgid "Next"
+msgstr "Tovább"
+
+msgid "Previous"
+msgstr "Vissza"
